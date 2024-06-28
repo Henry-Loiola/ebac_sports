@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Header from './components/Header'
 import Produtos from './containers/Produtos'
 
+import { Provider } from 'react-redux'
 import { GlobalStyle } from './styles'
+
+import { store } from './store'
 
 export type Produto = {
   id: number
@@ -12,14 +15,25 @@ export type Produto = {
 }
 
 function App() {
+  const [favoritos, setFavoritos] = useState<Produto[]>([])
+
+  function favoritar(produto: Produto) {
+    if (favoritos.find((p) => p.id === produto.id)) {
+      const favoritosSemProduto = favoritos.filter((p) => p.id !== produto.id)
+      setFavoritos(favoritosSemProduto)
+    } else {
+      setFavoritos([...favoritos, produto])
+    }
+  }
+
   return (
-    <>
+    <Provider store={store}>
       <GlobalStyle />
       <div className="container">
-        <Header />
-        <Produtos />
+        <Header favoritos={favoritos} />
+        <Produtos favoritos={favoritos} favoritar={favoritar} />
       </div>
-    </>
+    </Provider>
   )
 }
 
